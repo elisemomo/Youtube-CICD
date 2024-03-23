@@ -38,5 +38,21 @@ pipeline {
                 }
             }
         } 
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-Token'
+                }
+            }
+        }
+        
+        stage('Trivy File Scan') {
+            steps {
+                script {
+                    sh '/usr/local/bin/trivy fs . > trivy_result.txt'
+                }
+            }
+        }
   }
 }
