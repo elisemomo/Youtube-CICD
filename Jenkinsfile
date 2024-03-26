@@ -102,7 +102,7 @@ pipeline {
         stage('RUN CONTAINER') {
             steps {
                 script {
-                    def containername = 'reddit-clone'
+                    def containername = 'youtube-clone'
                     def isRunning = sh(script: "docker ps -a | grep ${containername}", returnStatus: true)
                     if (isRunning == 0) {
                         sh "docker stop ${containername}"
