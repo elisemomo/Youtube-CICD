@@ -57,13 +57,10 @@ pipeline {
 
         stage('Dependency-Check') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey 519861a7-1373-42ac-8f67-31aced23a70b', odcInstallation: 'Dependency-Check'
+                dependencyCheck additionalArguments: '', nvdCredentialsId: 'nvdAPIkey', odcInstallation: 'Dependency-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-
-
-
         stage('Login to DockerHUB') {
             steps {
                 script {
