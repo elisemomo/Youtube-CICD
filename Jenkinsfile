@@ -114,6 +114,22 @@ pipeline {
               
             }
         }
+        
+        stage('Deploy to Kubernetes') {
+            steps {
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                    sh 'kubectl apply -f Kubernetes'
+                }
+            }
+      }
 
+      stage('slack notification'){
+        steps {
+            script{
+                slackSend channel: '#cicd-projects', message: 'Build Success', teamDomain: 'elisemomo', tokenCredentialId: 'slack-token'
+            }
+            
+        }
+      }
   }
 }
