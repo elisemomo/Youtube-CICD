@@ -54,5 +54,66 @@ pipeline {
                 }
             }
         }
+
+        stage('Dependency-Check') {
+               steps {
+                dependencyCheck additionalArguments: '\'--scan ./ --disableYarnAudit --disableNodeAudit', nvdCredentialsId: 'nvdAPIkey', odcInstallation: 'Dependency-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
+        stage('Login to DockerHUB') {
+            steps {
+                script {
+                    sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                    echo 'Login Succeeded'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                script {
+                    sh 'docker build -t mukomelise/youtube:latest .' 
+                    echo "Image Build Successfully"
+                }
+            }
+        }
+
+        
+        stage('Docker Push') {
+            steps {
+                script {
+                    sh 'docker push mukomelise/youtube:latest'
+                    echo "Push Image to Registry"
+                }
+            }
+        }
+
+        stage('Trivy Image Scan') {
+            steps {
+                script {
+                    sh '/usr/local/bin/trivy image mukomelise/youtube:latest > trivy_image_result.txt'
+                    sh 'pwd'
+                }
+            }
+        }
+
+        stage('RUN CONTAINER') {
+            steps {
+                script {
+                    def containername = 'reddit-clone'
+                    def isRunning = sh(script: "docker ps -a | grep ${containername}", returnStatus: true)
+                    if (isRunning == 0) {
+                        sh "docker stop ${containername}"
+                        sh "docker rm ${containername}"
+                    }
+                    sh "docker run -d -p 3000:3000 --name ${containername} mukomelise/youtube:latest"
+                }
+                    
+              
+            }
+        }
+
   }
 }
