@@ -54,13 +54,6 @@ pipeline {
                 }
             }
         }
-        
-        stage('Dependency-Check') {
-               steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', nvdCredentialsId: 'nvdAPIkey', odcInstallation: 'Dependency-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
 
         stage('Dependency-Check') {
             steps {
